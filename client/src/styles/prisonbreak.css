@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'DJB Get Digital';
+  src: url('/fonts/DJB Get Digital.ttf');
+}
+
+html {
+  background-color: #000; 
+
+
+}
+
+body {
+  margin: 0;
+  background-color: #000;
+  color:#fff; 
+  font-family: 'DJB Get Digital';
+}
+
+.cellDoors {
+	display: flex;
+	-webkit-flex-flow: row wrap;
+	justify-content: space-around;
+	align-items: stretch;
+	margin-left:10%;
+	width:80%;
+}
+
+.cellDoorImg {
+	width:100%;
+}
+
+.cellDoorLabel {
+	margin-top:-5px;
+	text-align:center;
+	width:100%;
+	font-size:5em;
+	
+}
+
+.noiseMonitorContainer {
+	width:100%;
+	text-align:center;
+	font-size:3em;
+	color:#aaa;
+}
+
+.timeRemainingContainer {
+	width:100%;
+	text-align: center;
+	font-size:10em;
+	color:#fff;
+}
+
+.cellDoor {
+    flex: 0 0 11%
+}

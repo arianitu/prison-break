@@ -1,0 +1,28 @@
+{
+  "name": "<%= appSlug %>",
+  "version": "0.1.0",
+  "description": "<%= appName %>: <%= appDesc %>",
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.8.7"
+  },
+
+  "scripts": {
+    "dev": "gulp --type dev",
+    "start": "gulp",
+    "build": "gulp build"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
+    "testFileExtensions": [
+      "es6",
+      "js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "es6"
+    ]
+  }
+}
