@@ -25,6 +25,10 @@ body {
 	width:80%;
 }
 
+.cellDoor {
+    flex: 0 0 11%
+}
+
 .cellDoorImg {
 	width:100%;
 }
@@ -51,6 +55,17 @@ body {
 	color:#fff;
 }
 
-.cellDoor {
-    flex: 0 0 11%
+.noiseLevelMeterBar {
+	display: flex;
+	-webkit-flex-flow: row wrap;
+	justify-content: space-around;
+	align-items: stretch;
+	margin-left:10%;
+	width:80%;
+	margin-bottom:60px;
+}
+
+.noiseLevelBar {
+	flex: 0 0 2.5%;
+	height:40px;
 }
