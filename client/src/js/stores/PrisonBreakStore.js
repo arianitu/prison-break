@@ -2,48 +2,72 @@ import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
 import BaseStore from './BaseStore';
 import assign from 'object-assign';
-
-// data storage
-let _data = [];
-
-// add private functions to modify data
-function addItem(title, completed=false) {
-  _data.push({title, completed});
-}
+import SeedRandom from 'seedrandom';
 
 // Facebook style store creation.
 const PrisonBreakStore = assign({}, BaseStore, {
+
+  prisonState: {},
+
   // public methods used by Controller-View to operate on data
-  getPrisonState() {
-    return {
-      tasks: _data
+  getState() {
+    return this.prisonState;
+  },
+
+  setDefaultState() {
+    this.prisonState = {
+      paused:true,
+      cellDoorStates:[
+      ],
+      cellDoorCombinations:[
+      ]
     };
+
+    let rnd = SeedRandom(42);
+    for ( let idxCellDoor = 0; idxCellDoor < 8; ++idxCellDoor ) {
+
+      let doorCode = "";
+      for ( let idxCodeSlot = 0; idxCodeSlot < 6; ++idxCodeSlot ) {
+        doorCode += ""+(Math.floor(rnd()*3));
+      }
+
+      this.prisonState.cellDoorStates[idxCellDoor] = 0;
+      this.prisonState.cellDoorCombinations[idxCellDoor] = doorCode;
+      console.log("doorcode ", idxCellDoor, doorCode);
+    }
+
+  },
+
+  checkCode(tryCode) {
+    var prisonState = this.getState();
+
+    for ( var idxDoor = 0; idxDoor < 8; ++idxDoor ) {
+      let checkingCode = this.prisonState.cellDoorCombinations[idxDoor];
+      if ( checkingCode == tryCode ) {
+        this.prisonState.cellDoorStates[idxDoor] = 1;
+        break;
+      }
+    }
+    this.emitChange();
   },
 
   // register store with dispatcher, allowing actions to flow through
   dispatcherIndex: Dispatcher.register(function(payload) {
     let action = payload.action;
 
+    console.log('dispatcherIndex ', action.type);
+
     switch(action.type) {
-      case Constants.ActionTypes.TASK_ADDED:
-        let text = action.text.trim();
-        // NOTE: if this action needs to wait on another store:
-        // Dispatcher.waitFor([OtherStore.dispatchToken]);
-        // For details, see: http://facebook.github.io/react/blog/2014/07/30/flux-actions-and-the-dispatcher.html#why-we-need-a-dispatcher
-        if (text !== '') {
-          addItem(text);
-          TodoStore.emitChange();
-        }
+      case Constants.ActionTypes.RESET_GAME:
+        PrisonBreakStore.setDefaultState();
+        PrisonBreakStore.emitChange();
         break;
-
-      case Constants.ActionTypes.TASKS_CLEARED:
-        _data = [];
-        TodoStore.emitChange();
+      case Constants.ActionTypes.TRY_COMBINATION:
+        let tryCode = action.codeEntered;
+        PrisonBreakStore.checkCode(tryCode);
         break;
-
-      // add more cases for other actionTypes...
     }
   })
 });
 
-export default TodoStore;
+export default PrisonBreakStore;

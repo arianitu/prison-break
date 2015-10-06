@@ -2,6 +2,8 @@ import React from 'react';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import Input from 'react-bootstrap/lib/Input';
 import CellDoor from './CellDoor.jsx';
+import PrisonBreakStore from '../stores/PrisonBreakStore.js';
+import PrisonBreakActionCreator from '../actions/PrisonBreakActionCreators.js';
 
 export default React.createClass({
   getDefaultProps() {
@@ -12,14 +14,23 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      unlocked:false
+      cellDoorStates: [0,0,0,0,0,0,0,0]
     }
+  },
+
+  componentDidMount() {
+    PrisonBreakStore.addChangeListener(this._change);
+  },
+
+  _change() {
+    let prisonState = PrisonBreakStore.getState();
+    this.setState({cellDoorStates:prisonState.cellDoorStates});
   },
 
   render() {
     let cells = [];
     for ( let idxCell = 0; idxCell < this.props.totalCells; ++idxCell ) {
-      cells[idxCell] = <CellDoor cellNumber={idxCell+1} />;
+      cells[idxCell] = <CellDoor unlocked={this.state.cellDoorStates[idxCell]} cellNumber={idxCell+1} />;
     }
 
     return (

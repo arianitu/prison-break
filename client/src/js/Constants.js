@@ -7,7 +7,7 @@ export default {
   // Each time you add an action, add it here... They should be past-tense
   ActionTypes: keyMirror({
     RESET_GAME: null,
-    TASKS_CLEARED: null
+    TRY_COMBINATION: null
   }),
 
   ActionSources: keyMirror({
