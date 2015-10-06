@@ -90,12 +90,14 @@ func (s *Server) proxy() {
 	fmt.Println("Done")
 }
 
-func (s *Server) setupKeepAlive() {
+func (s *Server) keepAlive() {
 	ticker := time.NewTicker(5 * time.Second)
 	for _ = range ticker.C {
+		s.rwl.RLock()
 		for conn, _ := range s.conns {
 			conn.Ws.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(30 * time.Second))
 		}
+		s.rwl.RUnlock()
 	}
 }
 
@@ -134,7 +136,7 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	go server.setupKeepAlive()
+	go server.keepAlive()
 	go server.proxy()
 	go testCommands(pw)
 	
