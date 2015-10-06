@@ -82,7 +82,6 @@ func (s *Server) broadcast(message string) {
 }
 
 func (s *Server) proxy() {
-	time.Sleep(5 * time.Second)
 	scanner := bufio.NewScanner(s.From)
 	for scanner.Scan() {
 		s.broadcast(scanner.Text())
