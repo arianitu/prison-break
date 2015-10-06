@@ -9,6 +9,13 @@ export default {
     });
   },
 
+  tryCombination(codeEntered) {
+  	Dispatcher.handleViewAction({
+      type: Constants.ActionTypes.TRY_COMBINATION,
+      codeEntered: codeEntered
+    });
+  },
+
   completeTask(task) {
     console.warn('completeTask action not yet implemented...');
   }

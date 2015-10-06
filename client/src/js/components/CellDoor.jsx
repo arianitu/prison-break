@@ -5,24 +5,30 @@ import Input from 'react-bootstrap/lib/Input';
 export default React.createClass({
   getDefaultProps() {
     return {
-      cellNumber: 0
+      cellNumber: 0,
+      unlocked:0
     };
   },
 
   getInitialState() {
     return {
-      unlocked:Math.random()<0.5?true:false
     }
+  },
+
+  componentDidMount() {
+
   },
 
   render() {
 
-    let doorImageSrc = this.state.unlocked ? "images/door_unlocked.png" : "images/door_locked.png";
+    let doorImageSrc = this.props.unlocked ? "images/door_unlocked.png" : "images/door_locked.png";
 
+    let doorStyleColor = this.props.unlocked == 0 ? '#ff0000' : '#00ff00';
+    let doorStyle = {color:doorStyleColor};
     return (
       <div className="cellDoor">
         <img className="cellDoorImg" src={doorImageSrc} />
-        <div className="cellDoorLabel">
+        <div style={doorStyle} className="cellDoorLabel">
         {this.props.cellNumber}
         </div>
       </div>
