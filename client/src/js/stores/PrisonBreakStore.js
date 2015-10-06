@@ -2,7 +2,7 @@ import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
 import BaseStore from './BaseStore';
 import assign from 'object-assign';
-import SeedRandom from 'seedrandom';
+import SeedRandom from 'seed-random';
 
 // Facebook style store creation.
 const PrisonBreakStore = assign({}, BaseStore, {

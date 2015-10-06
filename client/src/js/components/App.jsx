@@ -18,9 +18,10 @@ export default React.createClass({
   componentDidMount() {
     PrisonBreakActionCreator.resetGame();
 
-    PrisonBreakActionCreator.tryCombination('021022');
+    //PrisonBreakActionCreator.tryCombination('021022');
 
-    var serversocket = new WebSocket("ws://192.168.1.138:8752/scary");
+    //var serversocket = new WebSocket("ws://192.168.1.138:8752/scary");
+    var serversocket = new WebSocket("ws://localhost:8752/scary");
 
     serversocket.onopen = function() {
       serversocket.send("Connection init");
@@ -33,7 +34,10 @@ export default React.createClass({
       var msgContents = e.data.substr(1);
       switch ( msgType ) {
         case 'k':
-          PrisonBreakActionCreators.tryCombination(msgContents);
+          PrisonBreakActionCreator.tryCombination(msgContents);
+          break;
+        case 'r':
+          PrisonBreakActionCreator.resetGame();
           break;
       }
     };

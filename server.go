@@ -101,7 +101,7 @@ func (s *Server) keepAlive() {
 }
 
 func testCommands(p *io.PipeWriter) {
-	commands := []string{"k2110224\n", "k2110225\n", "k2110226\n"}
+	commands := []string{"k021022\n", "k201222\n", "k202121\n", "k211022\n", "k102102\n", "k100220\n", "k201011\n", "r101\n"}
 	ticker := time.NewTicker(5 * time.Second)
 	
 	i := 0
