@@ -122,9 +122,6 @@ func main() {
 	if *serialPort == "" {
 		log.Fatalln("Serial port is required! Use --help for more info")
 	}
-
-	test := "lol"
-	fmt.Println([]byte(test))
 	
 	pr, pw := io.Pipe()
 	server := &Server{From: pr}
