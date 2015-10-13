@@ -70,9 +70,10 @@ func (s *Server) handleClientConnection(w http.ResponseWriter, r *http.Request) 
 
 func (s *Server) broadcast(message string) {
 	s.rwl.RLock()
+	
+	log.Println("Broadcasting: " + message)
 	for conn, _ := range s.conns {
 		conn.Mutex.Lock()
-		log.Println("Broadcasting: " + message)
 		if err := conn.Ws.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 			log.Println(err)
 		}
@@ -118,30 +119,31 @@ func main() {
 	httpHost := flag.String("httpHost", "", "HTTP host")
 	httpPort := flag.Int("httpPort", 8752, "HTTP port")
 	websocketUrl := flag.String("webUrl", "/scary", "Url for websocket communication")
-
+	
 	flag.Parse()
 	if *serialPort == "" {
 		log.Fatalln("Serial port is required! Use --help for more info")
 	}
 	
-	pr, pw := io.Pipe()
-	server := &Server{From: pr}
-	server.init()
-	
 	c := &serial.Config{Name: *serialPort, Baud: *baudRate}
 	fmt.Println(c)
-	// p, err := serial.OpenPort(c)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	
+	p, err := serial.OpenPort(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// pr, pw := io.Pipe()
+	server := &Server{From: p}
+	server.init()
+	
 
 	go server.keepAlive()
 	go server.proxy()
-	go testCommands(pw)
+	// go testCommands(pw)
 	
 	log.Printf("Proxying from serial port %s to websocket url %s:%d%s \n", *serialPort, *httpHost, *httpPort, *websocketUrl)
 	http.HandleFunc(*websocketUrl, server.handleClientConnection)
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", *httpHost, *httpPort), nil)
+	err = http.ListenAndServe(fmt.Sprintf("%s:%d", *httpHost, *httpPort), nil)
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
