@@ -4,36 +4,36 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/tarm/serial"
 	"github.com/gorilla/websocket"
-	"sync"
+	"github.com/tarm/serial"
+	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
-	"io"
 )
 
 var upgrader = websocket.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
-    CheckOrigin: func(r *http.Request) bool {
-        return true
-    },
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 type Conn struct {
 	Mutex *sync.Mutex
-	Ws *websocket.Conn
+	Ws    *websocket.Conn
 }
 
 type Server struct {
-	From io.Reader
+	From  io.Reader
 	conns map[*Conn]bool
-	rwl *sync.RWMutex
+	rwl   *sync.RWMutex
 }
 
 func (s *Server) init() {
-	s.conns = make(map[*Conn]bool);
+	s.conns = make(map[*Conn]bool)
 	s.rwl = &sync.RWMutex{}
 }
 
@@ -48,12 +48,12 @@ func (s *Server) handleClientConnection(w http.ResponseWriter, r *http.Request) 
 		log.Println(err)
 		return
 	}
-	
-	conn := &Conn{ Ws: ws, Mutex: &sync.Mutex{}}
+
+	conn := &Conn{Ws: ws, Mutex: &sync.Mutex{}}
 	s.rwl.Lock()
 	s.conns[conn] = true
 	s.rwl.Unlock()
-	
+
 	for {
 		_, _, err := ws.ReadMessage()
 		if err != nil {
@@ -61,7 +61,7 @@ func (s *Server) handleClientConnection(w http.ResponseWriter, r *http.Request) 
 			break
 		}
 	}
-	
+
 	log.Println("Removed connection!")
 	s.rwl.Lock()
 	delete(s.conns, conn)
@@ -70,7 +70,7 @@ func (s *Server) handleClientConnection(w http.ResponseWriter, r *http.Request) 
 
 func (s *Server) broadcast(message string) {
 	s.rwl.RLock()
-	
+
 	log.Println("Broadcasting: " + message)
 	for conn, _ := range s.conns {
 		conn.Mutex.Lock()
@@ -95,7 +95,7 @@ func (s *Server) keepAlive() {
 	for _ = range ticker.C {
 		s.rwl.RLock()
 		for conn, _ := range s.conns {
-			conn.Ws.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(30 * time.Second))
+			conn.Ws.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(30*time.Second))
 		}
 		s.rwl.RUnlock()
 	}
@@ -104,10 +104,10 @@ func (s *Server) keepAlive() {
 func testCommands(p *io.PipeWriter) {
 	commands := []string{"k021022\n", "k201222\n", "k202121\n", "k211022\n", "k102102\n", "k100220\n", "k001021\n", "k201011\n", "r101\n"}
 	ticker := time.NewTicker(5 * time.Second)
-	
+
 	i := 0
 	for _ = range ticker.C {
-		io.WriteString(p, commands[i % len(commands)])
+		io.WriteString(p, commands[i%len(commands)])
 		i++
 	}
 }
@@ -119,15 +119,15 @@ func main() {
 	httpHost := flag.String("httpHost", "", "HTTP host")
 	httpPort := flag.Int("httpPort", 8752, "HTTP port")
 	websocketUrl := flag.String("webUrl", "/scary", "Url for websocket communication")
-	
+
 	flag.Parse()
 	if *serialPort == "" {
 		log.Fatalln("Serial port is required! Use --help for more info")
 	}
-	
+
 	c := &serial.Config{Name: *serialPort, Baud: *baudRate}
 	fmt.Println(c)
-	
+
 	p, err := serial.OpenPort(c)
 	if err != nil {
 		log.Fatal(err)
@@ -135,12 +135,11 @@ func main() {
 	// pr, pw := io.Pipe()
 	server := &Server{From: p}
 	server.init()
-	
 
 	go server.keepAlive()
 	go server.proxy()
 	// go testCommands(pw)
-	
+
 	log.Printf("Proxying from serial port %s to websocket url %s:%d%s \n", *serialPort, *httpHost, *httpPort, *websocketUrl)
 	http.HandleFunc(*websocketUrl, server.handleClientConnection)
 	err = http.ListenAndServe(fmt.Sprintf("%s:%d", *httpHost, *httpPort), nil)
@@ -148,5 +147,3 @@ func main() {
 		panic("ListenAndServe: " + err.Error())
 	}
 }
-
-
