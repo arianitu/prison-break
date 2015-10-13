@@ -20,19 +20,22 @@ const PrisonBreakStore = assign({}, BaseStore, {
       cellDoorStates:[
       ],
       cellDoorCombinations:[
+        '10101010', // cell 1
+        '10101010',
+        '10101010',
+        '10101010',
+        '10101010',
+        '10101010',
+        '10101010',
+        '10101010', // cell 8
+        '10101010', // Mail indicator lock 1
+        '10101010', // Mail indicator lock 2
+        '10101010', // Mail indicator lock 3
       ]
     };
 
-    let rnd = SeedRandom(42);
-    for ( let idxCellDoor = 0; idxCellDoor < 8; ++idxCellDoor ) {
-
-      let doorCode = "";
-      for ( let idxCodeSlot = 0; idxCodeSlot < 6; ++idxCodeSlot ) {
-        doorCode += ""+(Math.floor(rnd()*3));
-      }
-
+    for ( let idxCellDoor = 0; idxCellDoor < this.prisonState.cellDoorCombinations.length; ++idxCellDoor ) {
       this.prisonState.cellDoorStates[idxCellDoor] = 0;
-      this.prisonState.cellDoorCombinations[idxCellDoor] = doorCode;
       console.log("doorcode ", idxCellDoor, doorCode);
     }
 
