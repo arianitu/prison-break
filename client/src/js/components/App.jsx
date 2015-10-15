@@ -29,6 +29,10 @@ export default React.createClass({
       serversocket.send("Connection init");
     }
 
+    setInterval(() => {
+        PrisonBreakActionCreator.checkDoorLocks("111111111");
+      }, 10000);
+
     // Write message on receive
     serversocket.onmessage = function(e) {
       console.log("Received: " + e.data);
@@ -41,6 +45,8 @@ export default React.createClass({
       console.log("type, content", type, content);
       if ( type == 'code' ) {
         PrisonBreakActionCreator.tryCombination(content);
+      }else if ( type == 'locks' ) {
+        PrisonBreakActionCreator.checkDoorLocks(content);
       }
     };
 
@@ -57,10 +63,29 @@ export default React.createClass({
           PrisonBreakActionCreator.pauseGame();
           break;
         case 45: // minus
-        PrisonBreakActionCreator.deltaTime(-60);
+          PrisonBreakActionCreator.deltaTime(-60);
           break;
         case 43: // plus
-        PrisonBreakActionCreator.deltaTime(60);
+          PrisonBreakActionCreator.deltaTime(60);
+          break;
+         case "q".charCodeAt(0):
+          PrisonBreakActionCreator.unlockMainGate(0);
+          break;
+        case "w".charCodeAt(0):
+          PrisonBreakActionCreator.unlockMainGate(1);
+          break;
+        case "e".charCodeAt(0):
+          PrisonBreakActionCreator.unlockMainGate(2);
+          break;
+        case 49: // 1
+        case 50: // 2
+        case 51: // 3
+        case 52: // 4
+        case 53: // 5
+        case 54: // 6
+        case 55: // 7
+        case 56: // 8
+          PrisonBreakActionCreator.unlockCell(e.keyCode-49);
           break;
       }
     }

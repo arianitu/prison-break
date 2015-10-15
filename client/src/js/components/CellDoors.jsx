@@ -24,13 +24,20 @@ export default React.createClass({
 
   _change() {
     let prisonState = PrisonBreakStore.getState();
-    this.setState({cellDoorStates:prisonState.cellDoorStates});
+    this.setState({cellDoorStates:prisonState.cellDoorStates,alarm:prisonState.alarm});
   },
 
   render() {
     let cells = [];
-    for ( let idxCell = 0; idxCell < this.props.totalCells; ++idxCell ) {
-      cells[idxCell] = <CellDoor unlocked={this.state.cellDoorStates[idxCell]} cellNumber={idxCell+1} />;
+    if ( !this.state.alarm ) {
+      for ( let idxCell = 0; idxCell < this.props.totalCells; ++idxCell ) {
+        cells[idxCell] = <CellDoor unlocked={this.state.cellDoorStates[idxCell]} cellNumber={idxCell+1} />;
+      }
+    } else {
+      cells[0] = <div className="invalidCodeEntered">{this.state.alarm}</div>;
+      setTimeout(() => {
+        PrisonBreakActionCreator.clearAlarms();
+      }, 5000);
     }
 
     return (

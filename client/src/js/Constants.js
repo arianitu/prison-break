@@ -10,7 +10,10 @@ export default {
     TRY_COMBINATION: null,
     START_GAME: null,
     PAUSE_GAME:null,
-    DELTA_TIME:null
+    DELTA_TIME:null,
+    UNLOCK_CELL:null,
+    CLEAR_ALARMS:null,
+    CHECK_DOOR_LOCKS:null
   }),
 
   ActionSources: keyMirror({

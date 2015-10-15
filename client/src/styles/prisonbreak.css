@@ -41,6 +41,11 @@ body {
 	
 }
 
+.invalidCodeEntered {
+	color:#ff0000;
+	font-size:9em;
+}
+
 .noiseMonitorContainer {
 	width:100%;
 	text-align:center;

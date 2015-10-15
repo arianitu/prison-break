@@ -3,6 +3,7 @@ import Constants from '../Constants';
 import BaseStore from './BaseStore';
 import assign from 'object-assign';
 import SeedRandom from 'seed-random';
+import PrisonBreakActionCreator from '../actions/PrisonBreakActionCreators.js';
 
 // Facebook style store creation.
 const PrisonBreakStore = assign({}, BaseStore, {
@@ -33,9 +34,9 @@ const PrisonBreakStore = assign({}, BaseStore, {
         '10101010', // cell 6
         '10101010', // cell 7
         '10101010', // cell 8
-        '10101010', // Mail indicator lock 1
-        '10101010', // Mail indicator lock 2
-        '10101010', // Mail indicator lock 3
+        '00000000', // Mail indicator lock 1
+        '00000000', // Mail indicator lock 2
+        '00000000', // Mail indicator lock 3
       ]
     };
 
@@ -62,16 +63,66 @@ const PrisonBreakStore = assign({}, BaseStore, {
 
   },
 
+  clearAlarms() {
+    this.prisonState.alarm = null;
+    this.emitChange();
+  },
+
   checkCode(tryCode) {
+
+    if ( this.prisonState.alarm ) {
+      return;
+    }
+
     var prisonState = this.getState();
+
+    var foundCode = false;
 
     for ( var idxDoor = 0; idxDoor < this.prisonState.cellDoorCombinations.length; ++idxDoor ) {
       let checkingCode = this.prisonState.cellDoorCombinations[idxDoor];
       if ( checkingCode == tryCode ) {
+        foundCode = true;
         this.prisonState.cellDoorStates[idxDoor] = 1;
+        if ( idxDoor >= 8 ) {
+          PrisonBreakActionCreator.unlockMainGate(idxDoor-8); 
+        }
       }
     }
+    if ( !foundCode ) {
+      this.prisonState.alarm = "Invalid Code Entered!";
+    }
     this.emitChange();
+  },
+
+  unlockCell(idxDoor) {
+    this.prisonState.cellDoorStates[idxDoor] = 1;
+    this.emitChange();
+  },
+
+  checkDoorLocks(doorStates) {
+
+    console.log("checkDoorLocks ", doorStates);
+    var OPEN = 1;
+    var CLOSED = 0;
+
+    let doorAlarms = [];
+    for ( let idxDoor = 0; idxDoor < 8; ++idxDoor ) {
+      if ( this.prisonState.cellDoorStates[idxDoor] == CLOSED && doorStates[idxDoor] == OPEN ) {
+        doorAlarms.push( "Cell " + (idxDoor+1) );
+      }
+    }
+
+    if ( doorStates[8] == OPEN && (
+            this.prisonState.cellDoorStates[8] == CLOSED ||
+            this.prisonState.cellDoorStates[9] == CLOSED ||
+            this.prisonState.cellDoorStates[10] == CLOSED ) ) {
+      doorAlarms.push("Main Gate");
+    }
+
+    if ( doorAlarms.length > 0 ) {
+      this.prisonState.alarm = "Door Alarm: "+doorAlarms.join(" & ");
+    }
+    this.emitChange();1
   },
 
   // register store with dispatcher, allowing actions to flow through
@@ -84,6 +135,14 @@ const PrisonBreakStore = assign({}, BaseStore, {
 
       case Constants.ActionTypes.START_GAME:
         PrisonBreakStore.startGame();
+        break;
+
+      case Constants.ActionTypes.CHECK_DOOR_LOCKS:
+        PrisonBreakStore.checkDoorLocks(action.doorStates);
+        break;
+
+      case Constants.ActionTypes.UNLOCK_CELL:
+        PrisonBreakStore.unlockCell(action.idxDoor);
         break;
 
       case Constants.ActionTypes.PAUSE_GAME:
@@ -99,6 +158,9 @@ const PrisonBreakStore = assign({}, BaseStore, {
       case Constants.ActionTypes.TRY_COMBINATION:
         let tryCode = action.codeEntered;
         PrisonBreakStore.checkCode(tryCode);
+        break;
+      case Constants.ActionTypes.CLEAR_ALARMS:
+        PrisonBreakStore.clearAlarms();
         break;
     }
   })
