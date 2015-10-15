@@ -29,9 +29,9 @@ export default React.createClass({
       serversocket.send("Connection init");
     }
 
-    setInterval(() => {
-        PrisonBreakActionCreator.checkDoorLocks("111111111");
-      }, 10000);
+    // setInterval(() => {
+    //     PrisonBreakActionCreator.checkDoorLocks("111111111");
+    //   }, 10000);
 
     // Write message on receive
     serversocket.onmessage = function(e) {
