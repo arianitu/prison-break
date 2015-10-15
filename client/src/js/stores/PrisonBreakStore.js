@@ -17,6 +17,8 @@ const PrisonBreakStore = assign({}, BaseStore, {
   setDefaultState() {
     this.prisonState = {
       paused:true,
+      newTime:(0*60*60)+(45*60)+0,
+      deltaSeconds:0,
       cellDoorStates:[
       ],
       cellDoorCombinations:[
@@ -36,15 +38,31 @@ const PrisonBreakStore = assign({}, BaseStore, {
 
     for ( let idxCellDoor = 0; idxCellDoor < this.prisonState.cellDoorCombinations.length; ++idxCellDoor ) {
       this.prisonState.cellDoorStates[idxCellDoor] = 0;
-      console.log("doorcode ", idxCellDoor, doorCode);
     }
+    this.emitChange();
+    this.prisonState.newTime = null;
+  },
+
+  startGame() {
+    this.prisonState.paused = false;
+    this.emitChange();
+  },
+
+  pauseGame() {
+    this.prisonState.paused = true;
+    this.emitChange();
+  },
+
+  deltaTime(deltaSeconds) {
+    this.prisonState.deltaSeconds = deltaSeconds;
+    this.emitChange();
 
   },
 
   checkCode(tryCode) {
     var prisonState = this.getState();
 
-    for ( var idxDoor = 0; idxDoor < 8; ++idxDoor ) {
+    for ( var idxDoor = 0; idxDoor < this.prisonState.cellDoorCombinations.length; ++idxDoor ) {
       let checkingCode = this.prisonState.cellDoorCombinations[idxDoor];
       if ( checkingCode == tryCode ) {
         this.prisonState.cellDoorStates[idxDoor] = 1;
@@ -61,9 +79,20 @@ const PrisonBreakStore = assign({}, BaseStore, {
     console.log('dispatcherIndex ', action.type);
 
     switch(action.type) {
+
+      case Constants.ActionTypes.START_GAME:
+        PrisonBreakStore.startGame();
+        break;
+
+      case Constants.ActionTypes.PAUSE_GAME:
+        PrisonBreakStore.pauseGame();
+        break;
+      case Constants.ActionTypes.DELTA_TIME:
+        PrisonBreakStore.deltaTime(action.deltaSeconds);
+        break;
+
       case Constants.ActionTypes.RESET_GAME:
         PrisonBreakStore.setDefaultState();
-        PrisonBreakStore.emitChange();
         break;
       case Constants.ActionTypes.TRY_COMBINATION:
         let tryCode = action.codeEntered;

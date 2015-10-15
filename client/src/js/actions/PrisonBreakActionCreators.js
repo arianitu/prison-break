@@ -9,6 +9,25 @@ export default {
     });
   },
 
+  startGame() {
+    Dispatcher.handleViewAction({
+      type: Constants.ActionTypes.START_GAME
+    });
+  },
+
+  pauseGame() {
+    Dispatcher.handleViewAction({
+      type: Constants.ActionTypes.PAUSE_GAME
+    });
+  },
+
+  deltaTime(deltaSeconds) {
+    Dispatcher.handleViewAction({
+      type: Constants.ActionTypes.DELTA_TIME,
+      deltaSeconds:deltaSeconds
+    });
+  },
+
   tryCombination(codeEntered) {
   	Dispatcher.handleViewAction({
       type: Constants.ActionTypes.TRY_COMBINATION,

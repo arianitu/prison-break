@@ -2,6 +2,7 @@ import React from 'react';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import Input from 'react-bootstrap/lib/Input';
 import CellDoor from './CellDoor.jsx';
+import PrisonBreakStore from './../stores/PrisonBreakStore.js';
 
 export default React.createClass({
   getDefaultProps() {
@@ -12,9 +13,9 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      // h + m + s
-      secondsRemaining: (0*60*60)+(45*60)+0,
-      timeoutId: 0
+      secondsRemaining: 0,
+      timeoutId: 0,
+      paused:true
     }
   },
 
@@ -24,19 +25,41 @@ export default React.createClass({
       return s;
   },
 
+  _change() {
+    let prisonState = PrisonBreakStore.getState();
+    this.setState({cellDoorStates:prisonState.cellDoorStates,paused:prisonState.paused});
+    if ( prisonState.newTime ) {
+      this.setState({secondsRemaining:prisonState.newTime});
+    }
+
+    if ( prisonState.deltaSeconds ) {
+      this.setState({secondsRemaining:this.state.secondsRemaining+prisonState.deltaSeconds});
+    }
+  },
+
   componentDidMount() {
-    console.log("componentDidMount")
+    console.log("componentDidMount");
+    PrisonBreakStore.addChangeListener(this._change);
+    this.startTimer();
+  },
+
+  startTimer() {
     let me = this;
-    setInterval( () => {
+    var currentIntervalId = setInterval( () => {
+      if ( me.state.paused ) {
+        return;
+      }
       var newTime = this.state.secondsRemaining-1;
       if ( newTime <= 0 ) {
-        newTime = (0*60*60)+(45*60)+0;
+        newTime = 0;
       }
       me.setState({secondsRemaining:newTime})
     }, 1000);
+    this.setState({timeoutId:currentIntervalId,isRunning:true});
   },
 
   secondsToString(seconds) {
+
     var numyears = Math.floor(seconds / 31536000);
     var numdays = Math.floor((seconds % 31536000) / 86400); 
     var numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);

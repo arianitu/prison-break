@@ -7,11 +7,15 @@ export default {
   // Each time you add an action, add it here... They should be past-tense
   ActionTypes: keyMirror({
     RESET_GAME: null,
-    TRY_COMBINATION: null
+    TRY_COMBINATION: null,
+    START_GAME: null,
+    PAUSE_GAME:null,
+    DELTA_TIME:null
   }),
 
   ActionSources: keyMirror({
     SERVER_ACTION: null,
     VIEW_ACTION: null
-  })
+  }),
+
 };
