@@ -21,14 +21,17 @@ const PrisonBreakStore = assign({}, BaseStore, {
       deltaSeconds:0,
       cellDoorStates:[
       ],
+      // 2 = up
+      // 1 = middle
+      // 0 = down
       cellDoorCombinations:[
-        '10101010', // cell 1
-        '10101010',
-        '10101010',
-        '10101010',
-        '10101010',
-        '10101010',
-        '10101010',
+        '00000000', // cell 1
+        '11111111', // cell 2
+        '22222222', // cell 3 
+        '20202020', // cell 4 
+        '12121212', // cell 5
+        '10101010', // cell 6
+        '10101010', // cell 7
         '10101010', // cell 8
         '10101010', // Mail indicator lock 1
         '10101010', // Mail indicator lock 2
@@ -66,7 +69,6 @@ const PrisonBreakStore = assign({}, BaseStore, {
       let checkingCode = this.prisonState.cellDoorCombinations[idxDoor];
       if ( checkingCode == tryCode ) {
         this.prisonState.cellDoorStates[idxDoor] = 1;
-        break;
       }
     }
     this.emitChange();

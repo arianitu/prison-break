@@ -32,9 +32,15 @@ export default React.createClass({
     // Write message on receive
     serversocket.onmessage = function(e) {
       console.log("Received: " + e.data);
-      var messageData = JSON.parse(e.data);
-      if ( e.data.code ) {
-        PrisonBreakActionCreator.tryCombination(e.data.code);
+      var messageData = e.data.substring(1,e.data.length-1);
+      console.log("messageData: " + messageData);
+      messageData = messageData.split(':');
+      var type = messageData[0];
+      var content = messageData[1];
+      content = content.substr(1, content.length-2);
+      console.log("type, content", type, content);
+      if ( type == 'code' ) {
+        PrisonBreakActionCreator.tryCombination(content);
       }
     };
 
