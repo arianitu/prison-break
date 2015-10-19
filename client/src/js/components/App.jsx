@@ -31,7 +31,7 @@ export default React.createClass({
 
     // setInterval(() => {
     //     PrisonBreakActionCreator.checkDoorLocks("111111111");
-    //   }, 10000);
+    //   }, 2000);
 
     // Write message on receive
     serversocket.onmessage = function(e) {
@@ -69,13 +69,13 @@ export default React.createClass({
           PrisonBreakActionCreator.deltaTime(60);
           break;
          case "q".charCodeAt(0):
-          PrisonBreakActionCreator.unlockMainGate(0);
+          PrisonBreakActionCreator.unlockMainGate(0, true);
           break;
         case "w".charCodeAt(0):
-          PrisonBreakActionCreator.unlockMainGate(1);
+          PrisonBreakActionCreator.unlockMainGate(1, true);
           break;
         case "e".charCodeAt(0):
-          PrisonBreakActionCreator.unlockMainGate(2);
+          PrisonBreakActionCreator.unlockMainGate(2, true);
           break;
         case 49: // 1
         case 50: // 2

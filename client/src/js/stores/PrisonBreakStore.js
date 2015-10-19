@@ -95,7 +95,7 @@ const PrisonBreakStore = assign({}, BaseStore, {
   },
 
   unlockCell(idxDoor) {
-    this.prisonState.cellDoorStates[idxDoor] = 1;
+    this.prisonState.cellDoorStates[idxDoor] = this.prisonState.cellDoorStates[idxDoor] ? 0 : 1;
     this.emitChange();
   },
 

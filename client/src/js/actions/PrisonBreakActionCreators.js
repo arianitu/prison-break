@@ -3,22 +3,38 @@ import Constants from '../Constants';
 
 export default {
   
+  mainGateStatus : [0,0,0],
+  ledControlScript : "http://prison-break.localhost.com:8888/utils/control_led.php",
+
   resetGame() {
 
     for ( let deviceIdx = 0; deviceIdx < 3; ++deviceIdx ) {
+
+      this.mainGateStatus[deviceIdx] = 0;
+
       var xhttp = new XMLHttpRequest();
-      xhttp.open("GET", "http://prison-break.localhost.com:8888/utils/control_led.php?deviceIdx="+deviceIdx+"&command=color=red&r=1", true);
+      xhttp.open("GET", this.ledControlScript+"?deviceIdx="+deviceIdx+"&command=color=red&r=1", true);
       xhttp.send();
     }
 
     Dispatcher.handleViewAction({
       type: Constants.ActionTypes.RESET_GAME
     });
+
   },
 
-  unlockMainGate(deviceIdx) {
+  unlockMainGate(deviceIdx, fromToggle) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "http://prison-break.localhost.com:8888/utils/control_led.php?deviceIdx="+deviceIdx+"&command=color=green&r=1", true);
+    if ( fromToggle ) {
+      this.mainGateStatus[deviceIdx] = this.mainGateStatus[deviceIdx] ? 0 : 1;
+    } else {
+      this.mainGateStatus[deviceIdx] = 1;
+    }
+
+    var command = this.mainGateStatus[deviceIdx] == 0 ? "color=red" : "color=green";
+    var scriptUrl = this.ledControlScript+"?deviceIdx="+deviceIdx+"&command="+command;
+    console.log(scriptUrl);
+    xhttp.open("GET", scriptUrl, true);
     xhttp.send();
   },
 
