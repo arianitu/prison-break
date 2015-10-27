@@ -1,2 +1,2 @@
 var gulp = require('gulp');
-gulp.task('default', ['build', 'images', 'fonts', 'watch', 'server']);
+gulp.task('default', ['build', 'images', 'fonts', 'audio', 'watch', 'server']);

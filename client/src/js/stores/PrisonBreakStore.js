@@ -1,3 +1,4 @@
+import React from 'react';
 import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
 import BaseStore from './BaseStore';
@@ -34,14 +35,18 @@ const PrisonBreakStore = assign({}, BaseStore, {
         '10101010', // cell 6
         '10101010', // cell 7
         '10101010', // cell 8
-        '00000000', // Mail indicator lock 1
-        '00000000', // Mail indicator lock 2
-        '00000000', // Mail indicator lock 3
+        '33333333', // Mail indicator lock 1
+        '44444444', // Mail indicator lock 2
+        '55555555', // Mail indicator lock 3
       ]
     };
 
     for ( let idxCellDoor = 0; idxCellDoor < this.prisonState.cellDoorCombinations.length; ++idxCellDoor ) {
-      this.prisonState.cellDoorStates[idxCellDoor] = 0;
+      if ( idxCellDoor == 2 ) {
+        this.prisonState.cellDoorStates[idxCellDoor] = 1;  
+      } else {
+        this.prisonState.cellDoorStates[idxCellDoor] = 0;
+      }
     }
     this.emitChange();
     this.prisonState.newTime = null;
@@ -68,6 +73,17 @@ const PrisonBreakStore = assign({}, BaseStore, {
     this.emitChange();
   },
 
+  triggerFaultyDoor() {
+    let FAULTY_DOOR = 6;
+
+    for ( let idxDoor = 0; idxDoor < 10; ++idxDoor ) {
+      setTimeout( () => {
+        this.prisonState.cellDoorStates[FAULTY_DOOR-1] = idxDoor%2;
+        this.emitChange();
+      }, idxDoor*50);
+    }
+  },
+
   checkCode(tryCode) {
 
     if ( this.prisonState.alarm ) {
@@ -78,18 +94,32 @@ const PrisonBreakStore = assign({}, BaseStore, {
 
     var foundCode = false;
 
+    var foundNewCodeDoorIndex = -1;
+
     for ( var idxDoor = 0; idxDoor < this.prisonState.cellDoorCombinations.length; ++idxDoor ) {
       let checkingCode = this.prisonState.cellDoorCombinations[idxDoor];
       if ( checkingCode == tryCode ) {
         foundCode = true;
+        if ( this.prisonState.cellDoorStates[idxDoor] == 0 ) {
+          foundNewCodeDoorIndex = idxDoor;
+        }
         this.prisonState.cellDoorStates[idxDoor] = 1;
         if ( idxDoor >= 8 ) {
           PrisonBreakActionCreator.unlockMainGate(idxDoor-8); 
         }
       }
     }
+
+    if ( foundNewCodeDoorIndex != -1 && foundNewCodeDoorIndex < 8 ) {
+      var audio = new Audio('audio/advanced_main_gate.mp3');
+      audio.play();
+    }
+
     if ( !foundCode ) {
       this.prisonState.alarm = "Invalid Code Entered!";
+
+      var audio = new Audio('audio/wrong_door_code.mp3');
+      audio.play();
     }
     this.emitChange();
   },
@@ -101,35 +131,48 @@ const PrisonBreakStore = assign({}, BaseStore, {
 
   checkDoorLocks(doorStates) {
 
-    console.log("checkDoorLocks ", doorStates);
-    var OPEN = 1;
-    var CLOSED = 0;
+    if ( this.prisonState.alarm ) {
+      return;
+    }
+
+    // console.log("checkDoorLocks ", doorStates);
+    var OPEN = 0;
+    var CLOSED = 1;
 
     let doorAlarms = [];
     for ( let idxDoor = 0; idxDoor < 8; ++idxDoor ) {
-      if ( this.prisonState.cellDoorStates[idxDoor] == CLOSED && doorStates[idxDoor] == OPEN ) {
-        doorAlarms.push( "Cell " + (idxDoor+1) );
+      if ( idxDoor == 5 ) {
+        continue;
       }
-    }
+      if ( this.prisonState.cellDoorStates[idxDoor] == OPEN && doorStates[idxDoor] == 0 ) {
+        if ( doorAlarms.length == 0 ) {
+          doorAlarms.push("Cell " + (idxDoor+1));
+          continue;
+        }
+        doorAlarms.push( (idxDoor+1) );
+      }
+    } 
 
     if ( doorStates[8] == OPEN && (
-            this.prisonState.cellDoorStates[8] == CLOSED ||
-            this.prisonState.cellDoorStates[9] == CLOSED ||
-            this.prisonState.cellDoorStates[10] == CLOSED ) ) {
+            this.prisonState.cellDoorStates[8] == 0 ||
+            this.prisonState.cellDoorStates[9] == 0 ||
+            this.prisonState.cellDoorStates[10] == 0 ) ) {
       doorAlarms.push("Main Gate");
     }
 
     if ( doorAlarms.length > 0 ) {
-      this.prisonState.alarm = "Door Alarm: "+doorAlarms.join(" & ");
+      this.prisonState.alarm = "Door Alarm: " + doorAlarms.join(", ");
+
+      var audio = new Audio('audio/alarm_tripped.mp3');
+      audio.play();
     }
-    this.emitChange();1
+    this.emitChange();
   },
 
   // register store with dispatcher, allowing actions to flow through
   dispatcherIndex: Dispatcher.register(function(payload) {
     let action = payload.action;
-
-    console.log('dispatcherIndex ', action.type);
+    // console.log('dispatcherIndex ', action.type);
 
     switch(action.type) {
 
@@ -161,6 +204,9 @@ const PrisonBreakStore = assign({}, BaseStore, {
         break;
       case Constants.ActionTypes.CLEAR_ALARMS:
         PrisonBreakStore.clearAlarms();
+        break;
+      case Constants.ActionTypes.TRIGGER_FAULTY_DOOR:
+        PrisonBreakStore.triggerFaultyDoor();
         break;
     }
   })

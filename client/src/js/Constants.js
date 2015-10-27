@@ -13,7 +13,8 @@ export default {
     DELTA_TIME:null,
     UNLOCK_CELL:null,
     CLEAR_ALARMS:null,
-    CHECK_DOOR_LOCKS:null
+    CHECK_DOOR_LOCKS:null,
+    TRIGGER_FAULTY_DOOR: null
   }),
 
   ActionSources: keyMirror({

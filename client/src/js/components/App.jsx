@@ -20,6 +20,14 @@ export default React.createClass({
   componentDidMount() {
     PrisonBreakActionCreator.resetGame();
 
+    window.tryCombination = function tryCombination(combination) {
+      PrisonBreakActionCreator.tryCombination(combination);
+    }
+
+    window.checkDoorLocks = function checkDoorLocks(lockState) {
+      PrisonBreakActionCreator.checkDoorLocks(lockState);
+    }
+
     //PrisonBreakActionCreator.tryCombination('021022');
 
     //var serversocket = new WebSocket("ws://192.168.1.138:8752/scary");
@@ -30,19 +38,19 @@ export default React.createClass({
     }
 
     // setInterval(() => {
-    //     PrisonBreakActionCreator.checkDoorLocks("111111111");
+    //     PrisonBreakActionCreator.checkDoorLocks("000000000");
     //   }, 2000);
 
     // Write message on receive
     serversocket.onmessage = function(e) {
-      console.log("Received: " + e.data);
+      // console.log("Received: " + e.data);
       var messageData = e.data.substring(1,e.data.length-1);
-      console.log("messageData: " + messageData);
+      // console.log("messageData: " + messageData);
       messageData = messageData.split(':');
       var type = messageData[0];
       var content = messageData[1];
       content = content.substr(1, content.length-2);
-      console.log("type, content", type, content);
+      // console.log("type, content", type, content);
       if ( type == 'code' ) {
         PrisonBreakActionCreator.tryCombination(content);
       }else if ( type == 'locks' ) {
@@ -50,11 +58,17 @@ export default React.createClass({
       }
     };
 
+    var me = this;
+    me.showHelp();
+
     window.onkeypress = function(e) {
-      console.log(e.keyCode);
+      // console.log("Key code pressed: "+e.keyCode);
       switch ( e.keyCode ) {
         case "r".charCodeAt(0):
           PrisonBreakActionCreator.resetGame();
+          break;
+        case "f".charCodeAt(0):
+          PrisonBreakActionCreator.triggerFaultyDoor();
           break;
         case "s".charCodeAt(0):
           PrisonBreakActionCreator.startGame();
@@ -72,10 +86,10 @@ export default React.createClass({
           PrisonBreakActionCreator.unlockMainGate(0, true);
           break;
         case "w".charCodeAt(0):
-          PrisonBreakActionCreator.unlockMainGate(1, true);
+          PrisonBreakActionCreator.unlockMainGate(0, false, true);
           break;
-        case "e".charCodeAt(0):
-          PrisonBreakActionCreator.unlockMainGate(2, true);
+        case "h".charCodeAt(0):
+          me.showHelp();
           break;
         case 49: // 1
         case 50: // 2
@@ -90,6 +104,20 @@ export default React.createClass({
       }
     }
 
+  },
+
+  showHelp() {
+    console.log("PRISON ESCAPE");
+    console.log("============================================");
+    console.log("Command list:");
+    console.log("r: reset game");
+    console.log("s: start game");
+    console.log("f: trigger faulty door");
+    console.log("p: pause game");
+    console.log("+/- increase / decrese time by 1 minute");
+    console.log("1-8: toggle cell door lock");
+    console.log("q: reset main gate locks");
+    console.log("w: advance main gate locks");
   },
 
   render() {

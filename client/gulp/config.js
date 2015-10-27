@@ -42,6 +42,10 @@ module.exports = {
     src: 'src/fonts/*.*',
     dest: dest + '/fonts' 
   },
+  audio: {
+    src: 'src/audio/*.*',
+    dest: dest + '/audio' 
+  },
   watch: {
     src: 'src/**/*.*',
     tasks: ['build']
