@@ -5,7 +5,7 @@ export default {
   
   mainGateState: 0,
   mainGateLockStatusArr : [0,0,0],
-  ledControlScript : "http://prison-break.localhost.com:8888/utils/control_led.php",
+  ledControlScript : "http://127.0.0.1/prison-break/utils/control_led.php",
 
   resetGame() {
 
@@ -62,27 +62,26 @@ export default {
 
       if ( newMainGateState != 0 ) {
         // ding...
-        if ( newMainGateState < 3 ) {
+        if ( newMainGateState < 2 ) {
           var audio = new Audio('audio/advanced_main_gate.mp3');
           audio.play();
         // unlocked all 
         } else {
-
-          for ( let idxDoor = 1; idxDoor < 4; ++idxDoor ) {
+          for ( let idxDoor = 1; idxDoor < 16; ++idxDoor ) {
             setTimeout( () => {
                var audio = new Audio('audio/advanced_main_gate.mp3');
               audio.play();
-            }, idxDoor*400);
+            }, idxDoor*350);
           }
         }
       }
 
       if ( newMainGateState == 1 ) {
-        this.makeLedRequest(0, 'rgb=0,0,255');
+        this.makeLedRequest(0, 'rgb=0,255,0');
         this.makeLedRequest(1, 'color=red');
       } else if ( newMainGateState == 2 ) {
-        this.makeLedRequest(0, 'rgb=0,0,255');
-        this.makeLedRequest(1, 'rgb=0,0,255');
+        this.makeLedRequest(0, 'rgb=0,255,0');
+        this.makeLedRequest(1, 'rgb=0,255,0');
       } else if ( newMainGateState == 3 ) {
         this.makeLedRequest(0, 'color=green');
         this.makeLedRequest(1, 'color=green');

@@ -50,9 +50,18 @@ export default React.createClass({
         return;
       }
       var newTime = this.state.secondsRemaining-1;
+
+      if ( newTime == 0 ) {
+        var audio = new Audio('audio/wrong_door_code.mp3');
+        audio.play();
+      }
       if ( newTime <= 0 ) {
         newTime = 0;
+      } else if ( newTime <= 10 ) {
+        var audio = new Audio('audio/time_left.mp3');
+        audio.play();  
       }
+      
       me.setState({secondsRemaining:newTime})
     }, 1000);
     this.setState({timeoutId:currentIntervalId,isRunning:true});

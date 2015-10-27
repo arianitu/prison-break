@@ -61,8 +61,26 @@ export default React.createClass({
     var me = this;
     me.showHelp();
 
+    var isCtrlDown = false;
+
+    window.onkeydown = function(e) {
+
+      switch ( e.keyCode ) {
+        case 17:
+          isCtrlDown = !isCtrlDown;
+          break;
+        }
+
+        console.log("isCtrlDown",isCtrlDown);
+    }
+
     window.onkeypress = function(e) {
-      // console.log("Key code pressed: "+e.keyCode);
+      // console.log("pass..",e.keyCode);
+      //   if ( !isCtrlDown ) {
+      //     console.log('no control..');
+      //     return;
+      //   }
+      console.log("key down: ", e.keyCode);
       switch ( e.keyCode ) {
         case "r".charCodeAt(0):
           PrisonBreakActionCreator.resetGame();
@@ -76,10 +94,10 @@ export default React.createClass({
         case "p".charCodeAt(0):
           PrisonBreakActionCreator.pauseGame();
           break;
-        case 45: // minus
+        case 45/*"n".charCodeAt(0)*/: // minus
           PrisonBreakActionCreator.deltaTime(-60);
           break;
-        case 43: // plus
+        case 43/*"m".charCodeAt(0)*/: // plus
           PrisonBreakActionCreator.deltaTime(60);
           break;
          case "q".charCodeAt(0):

@@ -27,17 +27,17 @@ const PrisonBreakStore = assign({}, BaseStore, {
       // 1 = middle
       // 0 = down
       cellDoorCombinations:[
-        '00000000', // cell 1
-        '11111111', // cell 2
-        '22222222', // cell 3 
-        '20202020', // cell 4 
-        '12121212', // cell 5
-        '10101010', // cell 6
-        '10101010', // cell 7
-        '10101010', // cell 8
-        '33333333', // Mail indicator lock 1
-        '44444444', // Mail indicator lock 2
-        '55555555', // Mail indicator lock 3
+        '00222200', // cell 1
+        '20020222', // cell 2
+        '99999999', // cell 3 
+        '20020002', // cell 4 
+        '02200000', // cell 5
+        '22000020', // cell 6
+        '00002202', // cell 7
+        '00220202', // cell 8
+        '20222202', // Mail indicator lock 1
+        '20222002', // Mail indicator lock 2
+        '12211010', // Mail indicator lock 3
       ]
     };
 
@@ -65,6 +65,7 @@ const PrisonBreakStore = assign({}, BaseStore, {
   deltaTime(deltaSeconds) {
     this.prisonState.deltaSeconds = deltaSeconds;
     this.emitChange();
+    this.prisonState.deltaSeconds = 0;
 
   },
 
@@ -110,6 +111,16 @@ const PrisonBreakStore = assign({}, BaseStore, {
       }
     }
 
+    let mainGateLocks = 3;
+    for ( let idxCellDoorCheck = 8; idxCellDoorCheck <= 10; ++idxCellDoorCheck ) {
+      if ( this.prisonState.cellDoorStates[idxCellDoorCheck] == 1 ) {
+        --mainGateLocks;
+      }
+    }
+    if ( mainGateLocks <= 1 ) {
+      this.prisonState.paused = true;
+    }
+
     if ( foundNewCodeDoorIndex != -1 && foundNewCodeDoorIndex < 8 ) {
       var audio = new Audio('audio/advanced_main_gate.mp3');
       audio.play();
@@ -129,22 +140,24 @@ const PrisonBreakStore = assign({}, BaseStore, {
     this.emitChange();
   },
 
-  checkDoorLocks(doorStates) {
+  checkDoorLocks(doorStates, fromInterval) {
+    
 
     if ( this.prisonState.alarm ) {
       return;
     }
 
     // console.log("checkDoorLocks ", doorStates);
-    var OPEN = 0;
-    var CLOSED = 1;
+    var OPEN = 1;
+    var CLOSED = 0;
 
-    let doorAlarms = [];
+
+   let doorAlarms = [];
     for ( let idxDoor = 0; idxDoor < 8; ++idxDoor ) {
       if ( idxDoor == 5 ) {
         continue;
       }
-      if ( this.prisonState.cellDoorStates[idxDoor] == OPEN && doorStates[idxDoor] == 0 ) {
+      if ( this.prisonState.cellDoorStates[idxDoor] == 0 && doorStates[idxDoor] == 1 ) {
         if ( doorAlarms.length == 0 ) {
           doorAlarms.push("Cell " + (idxDoor+1));
           continue;
@@ -153,11 +166,16 @@ const PrisonBreakStore = assign({}, BaseStore, {
       }
     } 
 
-    if ( doorStates[8] == OPEN && (
-            this.prisonState.cellDoorStates[8] == 0 ||
-            this.prisonState.cellDoorStates[9] == 0 ||
-            this.prisonState.cellDoorStates[10] == 0 ) ) {
-      doorAlarms.push("Main Gate");
+    let mainGateLocks = 3;
+    for ( let idxCellDoorCheck = 8; idxCellDoorCheck <= 10; ++idxCellDoorCheck ) {
+      if ( this.prisonState.cellDoorStates[idxCellDoorCheck] == 0 ) {
+        --mainGateLocks;
+      }
+    }
+
+    if ( doorStates[8] == 1 && mainGateLocks <= 1 ) {
+      // ignore triggering alarm for main gate being unlocked.
+      // doorAlarms.push("Main Gate");
     }
 
     if ( doorAlarms.length > 0 ) {
