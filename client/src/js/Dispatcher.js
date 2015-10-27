@@ -2,7 +2,7 @@ import {Dispatcher} from 'flux';
 import Constants from './Constants';
 import assign from 'object-assign';
 
-console.log("Dispatcher included.....");
+// console.log("Dispatcher included.....");
 
 /**
  * Purpose: to create a single dispatcher instance for use throughout the

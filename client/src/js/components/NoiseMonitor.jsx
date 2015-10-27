@@ -64,7 +64,7 @@ export default React.createClass({
   render() {
 
     var bars = this.generateBar();
-    console.log(bars);
+    // console.log(bars);
     return (
       <div>
         <div className="noiseMonitorContainer">
