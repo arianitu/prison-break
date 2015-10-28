@@ -52,13 +52,15 @@ export default React.createClass({
       var newTime = this.state.secondsRemaining-1;
 
       if ( newTime == 0 ) {
-        var audio = new Audio('audio/wrong_door_code.mp3');
+        // var audio = new Audio('audio/wrong_door_code.mp3');
+        var audio = new Audio('audio/halloween/male_scream.mp3');
         audio.play();
       }
       if ( newTime <= 0 ) {
         newTime = 0;
       } else if ( newTime <= 10 ) {
-        var audio = new Audio('audio/time_left.mp3');
+        // var audio = new Audio('audio/halloween/wood_thud.mp3');
+        var audio = new Audio('audio/halloween/creaky_swing.mp3');
         audio.play();  
       }
       

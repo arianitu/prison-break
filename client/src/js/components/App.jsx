@@ -18,6 +18,19 @@ export default React.createClass({
   },
 
   componentDidMount() {
+
+
+    let rndAudio = ['creaky_door.mp3','female_scream.mp3','male_scream.mp3','saw.mp3'];
+
+    setInterval( () => {
+      if ( Math.random() <= 1.0 ) {
+
+        let audio = new Audio('audio/halloween/'+ rndAudio[Math.floor(Math.random()*rndAudio.length)]  );
+        audio.play();
+      }
+    }, 10*60*1000 );
+
+
     PrisonBreakActionCreator.resetGame();
 
     window.tryCombination = function tryCombination(combination) {
@@ -95,10 +108,10 @@ export default React.createClass({
           PrisonBreakActionCreator.pauseGame();
           break;
         case 45/*"n".charCodeAt(0)*/: // minus
-          PrisonBreakActionCreator.deltaTime(-60);
+          PrisonBreakActionCreator.deltaTime(-15);
           break;
         case 43/*"m".charCodeAt(0)*/: // plus
-          PrisonBreakActionCreator.deltaTime(60);
+          PrisonBreakActionCreator.deltaTime(15);
           break;
          case "q".charCodeAt(0):
           PrisonBreakActionCreator.unlockMainGate(0, true);
