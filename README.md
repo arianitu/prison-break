@@ -2,7 +2,7 @@
 
 Break out of prison fool. 
 
-This is the code that ran the prison escape room in London, Ontario.
+This is the code that ran the prison escape room in London, Ontario. The client was done by https://github.com/dbchap and the server was done by me.
 
 # Historic Old Courthouse - Prison Escape
 <img src="https://cdn.evbuc.com/eventlogos/85000203/prison2.jpg" width="300" height="300">
